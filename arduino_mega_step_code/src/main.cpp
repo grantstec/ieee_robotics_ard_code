@@ -10,7 +10,7 @@
 TMC2209Stepper driverX(&X_SERIAL, R_SENSE, 0x00);  // Replace 0x00 with the actual driver address
 TMC2209Stepper driverZ(&Z_SERIAL, R_SENSE, 0x01);  // Replace 0x01 with the actual driver address
 
-// Stepper Pins (Mega 2560)
+// Stepper Pins
 #define X_STEP_PIN 54
 #define X_DIR_PIN 55
 #define X_ENABLE_PIN 38
@@ -23,35 +23,34 @@ TMC2209Stepper driverZ(&Z_SERIAL, R_SENSE, 0x01);  // Replace 0x01 with the actu
 AccelStepper stepperX(AccelStepper::DRIVER, X_STEP_PIN, X_DIR_PIN);
 AccelStepper stepperZ(AccelStepper::DRIVER, Z_STEP_PIN, Z_DIR_PIN);
 
-// Robot Parameters
-const float WHEEL_DIAMETER = 0.0889;  // 3.5" in meters
-const float STEPS_PER_METER = (200 * 16) / (PI * WHEEL_DIAMETER);  // 3200 steps/rev
-
-// ROS Communication
+// Constants
 const unsigned long REPORT_INTERVAL = 100;
 unsigned long last_report = 0;
 
 void setup() {
     Serial.begin(115200);
+    
+    // TMC2209 Initialization
     X_SERIAL.begin(115200);
     Z_SERIAL.begin(115200);
-
-    // TMC2209 Driver Configuration
+    
     driverX.begin();
+    driverX.pdn_disable(true);
     driverX.toff(5);
     driverX.en_spreadCycle(false);
     driverX.microsteps(16);
-    driverX.irun(31);  // 1.2A
-    driverX.ihold(10);  // 0.4A
+    driverX.irun(31);
+    driverX.ihold(10);
 
     driverZ.begin();
+    driverZ.pdn_disable(true);
     driverZ.toff(5);
     driverZ.en_spreadCycle(false);
     driverZ.microsteps(16);
     driverZ.irun(31);
     driverZ.ihold(10);
 
-    // Stepper Motor Configuration
+    // Stepper Configuration
     stepperX.setEnablePin(X_ENABLE_PIN);
     stepperX.setPinsInverted(false, false, true);
     stepperX.enableOutputs();
@@ -63,31 +62,32 @@ void setup() {
     stepperZ.enableOutputs();
     stepperZ.setMaxSpeed(12000);
     stepperZ.setAcceleration(8000);
-
-    Serial.println("System Ready");
 }
 
 void loop() {
-    // Handle incoming velocity commands
+    // Handle incoming commands
     if (Serial.available() > 0) {
         String cmd = Serial.readStringUntil('\n');
         cmd.trim();
         
-        int sep = cmd.indexOf(' ');
-        if (sep != -1) {
-            float left = cmd.substring(0, sep).toFloat();
-            float right = cmd.substring(sep+1).toFloat();
-            
-            stepperX.setSpeed(left * STEPS_PER_METER);
-            stepperZ.setSpeed(right * STEPS_PER_METER);
+        if (cmd.startsWith("CMD:")) {
+            cmd.remove(0, 4);
+            int comma = cmd.indexOf(',');
+            if (comma != -1) {
+                long left = cmd.substring(0, comma).toInt();
+                long right = cmd.substring(comma+1).toInt();
+                
+                stepperX.setSpeed(left);
+                stepperZ.setSpeed(right);
+            }
         }
     }
 
-    // Run motors continuously
+    // Run motors
     stepperX.runSpeed();
     stepperZ.runSpeed();
 
-    // Report positions to ROS
+    // Report positions
     if (millis() - last_report > REPORT_INTERVAL) {
         Serial.print("STEPS:");
         Serial.print(stepperX.currentPosition());
