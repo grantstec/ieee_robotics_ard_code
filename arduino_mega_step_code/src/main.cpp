@@ -52,13 +52,13 @@ void setup() {
 
     // Stepper Configuration
     stepperX.setEnablePin(X_ENABLE_PIN);
-    stepperX.setPinsInverted(false, false, true);
+    stepperX.setPinsInverted(true, false, true);
     stepperX.enableOutputs();
     stepperX.setMaxSpeed(12000);
     stepperX.setAcceleration(8000);
 
     stepperZ.setEnablePin(Z_ENABLE_PIN);
-    stepperZ.setPinsInverted(false, false, true);
+    stepperZ.setPinsInverted(true, false, true);
     stepperZ.enableOutputs();
     stepperZ.setMaxSpeed(12000);
     stepperZ.setAcceleration(8000);
