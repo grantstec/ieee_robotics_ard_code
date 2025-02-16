@@ -3,12 +3,12 @@
 #include <AccelStepper.h>
 
 // TMC2209 Configuration
-#define L_SERIAL Serial2  // Left motor
-#define R_SERIAL Serial1  // Right motor
+#define L_SERIAL Serial3  // Left motor
+#define R_SERIAL Serial2  // Right motor
 #define R_SENSE 0.11f
 
 TMC2209Stepper driverL(&L_SERIAL, R_SENSE, 0x00);  // Replace 0x00 with the actual driver address
-TMC2209Stepper driverR(&R_SERIAL, R_SENSE, 0x01);  // Replace 0x01 with the actual driver address
+TMC2209Stepper driverR(&R_SERIAL, R_SENSE, 0x00);  // Replace 0x01 with the actual driver address
 
 // Stepper Pins
 #define R_STEP_PIN 54
@@ -39,14 +39,16 @@ void setup() {
   driverL.toff(5);
   driverL.en_spreadCycle(false);
   driverL.microsteps(16);
-  driverL.irun(31);
+  driverL.irun(5);
+  driverL.ihold(5);
 
   driverR.begin();
   driverR.pdn_disable(true);
   driverR.toff(5);
   driverR.en_spreadCycle(false);
   driverR.microsteps(16);
-  driverR.irun(31);
+  driverR.irun(5);
+  driverR.ihold(5);
 
   // Stepper Configuration
   stepperL.setEnablePin(L_ENABLE_PIN);
