@@ -34,31 +34,34 @@ void loop() {
   if (now - lastUpdate >= (1000/UPDATE_RATE)) {
     lastUpdate = now;
     
-    // [!] ORIENTATION DATA COLLECTION [!]
+    // Get all sensor data
     imu::Quaternion quat = bno.getQuat();
-    // imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-    
-    // [!] DATA FORMAT MUST MATCH ROS2 BRIDGE EXPECTATIONS [!]
-    Serial.print("ORI:");
-    Serial.print(quat.x(), 4);  // X COMPONENT
-    Serial.print(",");
-    Serial.print(quat.y(), 4);  // Y COMPONENT
-    Serial.print(",");
-    Serial.print(quat.z(), 4);  // Z COMPONENT
-    Serial.print(",");
-    Serial.print(quat.w(), 4);  // W COMPONENT
-    Serial.println();
+    imu::Vector<3> gyro = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+    imu::Vector<3> accel = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
 
-    // [!] OPTIONAL - CALIBRATION STATUS MONITORING [!]
-    uint8_t sys, gyro, accel, mag = 0;
-    bno.getCalibration(&sys, &gyro, &accel, &mag);
-    Serial.print("CALIB: ");
-    Serial.print(sys);   // SYSTEM (3=FULLY CALIBRATED)
-    Serial.print(",");
-    Serial.print(gyro);  // GYROSCOPE
-    Serial.print(",");
-    Serial.print(accel); // ACCELEROMETER
-    Serial.print(",");
-    Serial.println(mag); // MAGNETOMETER
+    // Send formatted data
+    Serial.print("IMU:");
+    Serial.print(quat.x(), 4); Serial.print(",");
+    Serial.print(quat.y(), 4); Serial.print(",");
+    Serial.print(quat.z(), 4); Serial.print(",");
+    Serial.print(quat.w(), 4); Serial.print(",");
+    Serial.print(gyro.x(), 4); Serial.print(",");
+    Serial.print(gyro.y(), 4); Serial.print(",");
+    Serial.print(gyro.z(), 4); Serial.print(",");
+    Serial.print(accel.x(), 4); Serial.print(",");
+    Serial.print(accel.y(), 4); Serial.print(",");
+    Serial.println(accel.z(), 4);
+  
+    // // [!] OPTIONAL - CALIBRATION STATUS MONITORING [!]
+    // uint8_t sys, gyro, accel, mag = 0;
+    // bno.getCalibration(&sys, &gyro, &accel, &mag);
+    // Serial.print("CALIB: ");
+    // Serial.print(sys);   // SYSTEM (3=FULLY CALIBRATED)
+    // Serial.print(",");
+    // Serial.print(gyro);  // GYROSCOPE
+    // Serial.print(",");
+    // Serial.print(accel); // ACCELEROMETER
+    // Serial.print(",");
+    // Serial.println(mag); // MAGNETOMETER
   }
 }
