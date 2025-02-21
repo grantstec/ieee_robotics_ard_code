@@ -39,7 +39,7 @@ void setup() {
   driverL.toff(5);
   driverL.en_spreadCycle(false);
   driverL.microsteps(16);
-  driverL.irun(5);
+  driverL.irun(31);
   driverL.ihold(5);
 
   driverR.begin();
@@ -47,7 +47,7 @@ void setup() {
   driverR.toff(5);
   driverR.en_spreadCycle(false);
   driverR.microsteps(16);
-  driverR.irun(5);
+  driverR.irun(31);  // Set to maximum current value
   driverR.ihold(5);
 
   // Stepper Configuration
